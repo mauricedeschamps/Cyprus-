@@ -25,10 +25,12 @@
       --accent-dark: #0b5e8a;
       --border: #e0d6c2;
       --header-bg: #ffffffcc;
-      --footer-bg: #f3efE4;
+      --footer-bg: #f3efe4;
       --shadow: rgba(0, 0, 0, 0.05);
       --btn-bg: #1e88e5;
       --btn-text: white;
+      --sponsor-bg: #ffffffcc;
+      --sponsor-text: #5a6e4a;
     }
 
     body.dark {
@@ -44,6 +46,8 @@
       --shadow: rgba(0, 0, 0, 0.2);
       --btn-bg: #4aa3df;
       --btn-text: #1e2a2e;
+      --sponsor-bg: #2d3e40cc;
+      --sponsor-text: #cbd5c4;
     }
 
     body {
@@ -55,7 +59,6 @@
       margin: 0;
     }
 
-    /* ヘッダー・フッターは固定せず通常フロー */
     header {
       background: var(--header-bg);
       backdrop-filter: blur(8px);
@@ -103,6 +106,49 @@
       max-width: 1300px;
       margin: 2rem auto;
       padding: 0 1.5rem;
+    }
+
+    /* Google Map コンテナ */
+    .map-container {
+      margin: 1.5rem 0 2rem 0;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px var(--shadow);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 350px;
+      border: 0;
+      display: block;
+    }
+
+    /* スポンサー枠 */
+    .sponsor {
+      background: var(--sponsor-bg);
+      backdrop-filter: blur(4px);
+      border-radius: 24px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      border: 1px solid var(--border);
+      font-weight: 500;
+      color: var(--sponsor-text);
+    }
+
+    .sponsor p {
+      margin: 0;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    .sponsor .sponsor-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
     }
 
     /* カードグリッド */
@@ -209,6 +255,9 @@
       .card-grid {
         gap: 1.2rem;
       }
+      .map-container iframe {
+        height: 250px;
+      }
     }
   </style>
 </head>
@@ -274,7 +323,7 @@
     const langBtn = document.getElementById('langBtn');
     const themeBtn = document.getElementById('themeBtn');
 
-    // テーマ切り替え (dark / light)
+    // テーマ切り替え
     function setTheme(theme) {
       currentTheme = theme;
       if (theme === 'dark') {
@@ -302,9 +351,45 @@
       setLanguage(currentLang === 'en' ? 'el' : 'en');
     }
 
-    // メイン一覧描画
+    // スポンサー枠のHTMLを生成（上下共通）
+    function createSponsorSection() {
+      const sponsorDiv = document.createElement('div');
+      sponsorDiv.className = 'sponsor';
+      sponsorDiv.innerHTML = `
+        <div class="sponsor-label">✨ Sponsored ✨</div>
+        <p>🌊 Plan your Cyprus journey with <strong>Cyprus Escape</strong> — your ultimate travel companion.<br>
+        🏛️ Discover ancient ruins, taste authentic halloumi, and dive into the turquoise sea.</p>
+      `;
+      return sponsorDiv;
+    }
+
+    // メイン一覧描画（Googleマップとスポンサー枠を含む）
     function renderList() {
       const isEn = currentLang === 'en';
+      
+      // メインコンテナ
+      const container = document.createElement('div');
+      
+      // 1. 上部スポンサー枠
+      const topSponsor = createSponsorSection();
+      container.appendChild(topSponsor);
+      
+      // 2. Google Map 埋め込み (ニコシア中心部)
+      const mapDiv = document.createElement('div');
+      mapDiv.className = 'map-container';
+      // Google Maps Embed API (APIキーなしでも動作する埋め込み例、必要ならキーを追加)
+      // 中心: ニコシア (Lat: 35.1667, Lng: 33.3667) ズーム12
+      mapDiv.innerHTML = `
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d52335.16761346227!2d33.31697017362666!3d35.166668402847065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14de1742d62b65f3%3A0xf23bc7d53dd928a6!2sNicosia%2C%20Cyprus!5e0!3m2!1sen!2sus!4v1712134567890!5m2!1sen!2sus"
+          allowfullscreen="" 
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      `;
+      container.appendChild(mapDiv);
+      
+      // 3. カードグリッド
       const grid = document.createElement('div');
       grid.className = 'card-grid';
       places.forEach(place => {
@@ -325,11 +410,17 @@
         card.appendChild(contentDiv);
         grid.appendChild(card);
       });
+      container.appendChild(grid);
+      
+      // 4. 下部スポンサー枠
+      const bottomSponsor = createSponsorSection();
+      container.appendChild(bottomSponsor);
+      
       app.innerHTML = '';
-      app.appendChild(grid);
+      app.appendChild(container);
     }
 
-    // 詳細描画
+    // 詳細描画（スポンサー枠やマップは表示しない）
     function renderDetail(id) {
       const place = places.find(p => p.id === id);
       if (!place) return;
@@ -376,7 +467,6 @@
       selectedId = id;
       showingDetail = true;
       renderDetail(id);
-      // history に状態を追加
       const url = new URL(window.location);
       url.searchParams.set('id', id);
       window.history.pushState({ id, view: 'detail' }, '', url);
@@ -386,13 +476,12 @@
       showingDetail = false;
       selectedId = null;
       renderList();
-      // URL をクリア
       const url = new URL(window.location);
       url.searchParams.delete('id');
       window.history.pushState({ view: 'list' }, '', url);
     }
 
-    // ページ全体の描画 (現在の状態に応じて)
+    // ページ全体の描画
     function renderPage() {
       if (showingDetail && selectedId !== null) {
         renderDetail(selectedId);
@@ -424,7 +513,7 @@
       if (savedTheme === 'light') {
         setTheme('light');
       } else {
-        setTheme('dark');   // デフォルトdark
+        setTheme('dark');
       }
       // 言語復元
       const savedLang = localStorage.getItem('language');

@@ -2,7 +2,7 @@ const CACHE_NAME = 'cyprus-guide-v1';
 const urlsToCache = [
   '/',
   'index.html',
-  'manifest.json'
+  'manifest.json',
   // アイコンファイルもキャッシュする場合:
   'icons/icon-192.jpg',
   'icons/icon-512.jpg'

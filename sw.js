@@ -4,8 +4,8 @@ const urlsToCache = [
   'index.html',
   'manifest.json'
   // アイコンファイルもキャッシュする場合:
-  // 'icons/icon-192.jpg',
-  // 'icons/icon-512.jpg'
+  'icons/icon-192.jpg',
+  'icons/icon-512.jpg'
 ];
 
 // インストール時

@@ -1,11 +1,11 @@
 const CACHE_NAME = 'cyprus-guide-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/manifest.json'
+  'index.html',
+  'manifest.json'
   // アイコンファイルもキャッシュする場合:
-  // '/icon-192.png',
-  // '/icon-512.png'
+  // 'icons/icon-192.jpg',
+  // 'icons/icon-512.jpg'
 ];
 
 // インストール時
